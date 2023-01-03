@@ -1,0 +1,21 @@
+{
+	"name": "DS_ECDC_JSONFILE",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_COVID19GEN2DL",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "githubusercontent-ecdc-file-list.json",
+				"folderPath": "json",
+				"fileSystem": "covid19"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,33 @@
+{
+	"name": "DS_git_ecdcfiles_csv_ADLS2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_COVID19GEN2DL",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"targetfilename": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().targetfilename",
+					"type": "Expression"
+				},
+				"folderPath": "raw",
+				"fileSystem": "covid19"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": false,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

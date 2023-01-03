@@ -1,0 +1,49 @@
+{
+	"name": "DS_Empdetails_azsql",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_kalyandemosql",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "EmpID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "EmpName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "EmpGender",
+				"type": "nvarchar"
+			},
+			{
+				"name": "EmpSalary",
+				"type": "money",
+				"precision": 19,
+				"scale": 4
+			},
+			{
+				"name": "EmpDep",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Createddate",
+				"type": "date"
+			},
+			{
+				"name": "modifieddate",
+				"type": "date"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Emp_Details"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

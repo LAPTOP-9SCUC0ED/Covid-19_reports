@@ -1,0 +1,31 @@
+{
+	"name": "DS_git_ecd_files_http",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Git_ECDCdata_http",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"sourceurl": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@dataset().sourceurl",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

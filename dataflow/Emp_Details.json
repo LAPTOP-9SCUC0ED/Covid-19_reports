@@ -1,0 +1,218 @@
+{
+	"name": "Emp_Details",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_Empdetails",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_Empdetails_azsql",
+						"type": "DatasetReference"
+					},
+					"name": "Reffrencetable"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_Empdetails_azsql",
+						"type": "DatasetReference"
+					},
+					"name": "insert"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_Empdetails_azsql",
+						"type": "DatasetReference"
+					},
+					"name": "update"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_Empdetails_azsql",
+						"type": "DatasetReference"
+					},
+					"name": "donothing"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "Generatehashid"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "joiningwithhashid"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "alter"
+				},
+				{
+					"name": "split1"
+				},
+				{
+					"name": "DRInsertingdata"
+				},
+				{
+					"name": "DRUpdateddata"
+				},
+				{
+					"name": "select3"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EmpId as integer,",
+				"          EmpName as string,",
+				"          EmpGender as string,",
+				"          EmpSalary as short,",
+				"          EmpDep as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source(output(",
+				"          EmpID as integer,",
+				"          EmpName as string,",
+				"          EmpGender as string,",
+				"          EmpSalary as decimal(19,4),",
+				"          EmpDep as string,",
+				"          Createddate as date,",
+				"          modifieddate as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> Reffrencetable",
+				"source1 derive(Createddate = currentUTC(),",
+				"          Modifieddate = currentUTC()) ~> derivedColumn1",
+				"derivedColumn1 derive(newhashid = sha1(EmpId,EmpName,EmpGender,EmpSalary,EmpDep)) ~> Generatehashid",
+				"Reffrencetable derive(oldhashid = sha1Binary(EmpID,EmpName,EmpGender,EmpSalary,EmpDep)) ~> derivedColumn2",
+				"Generatehashid, select1 union(byName: true)~> joiningwithhashid",
+				"derivedColumn2 select(mapColumn(",
+				"          oldhashid",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"DRInsertingdata select(mapColumn(",
+				"          EmpId,",
+				"          EmpName,",
+				"          EmpGender,",
+				"          EmpSalary,",
+				"          EmpDep,",
+				"          Createddate,",
+				"          Modifieddate",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"joiningwithhashid alterRow(upsertIf(\"oldhashid\"!=\"newhashid\"),",
+				"     insertIf(isNull(oldhashid))) ~> alter",
+				"alter split(isNull(oldhashid),",
+				"     \"oldhashid\" != \"newhashid\",",
+				"     disjoint: true) ~> split1@(Insert, update, DONOTHING)",
+				"split1@Insert derive(Createddate = currentUTC(),",
+				"          Modifieddate = currentUTC()) ~> DRInsertingdata",
+				"split1@update derive(Modifieddate = currentUTC()) ~> DRUpdateddata",
+				"DRUpdateddata select(mapColumn(",
+				"          EmpId,",
+				"          EmpName,",
+				"          EmpGender,",
+				"          EmpSalary,",
+				"          EmpDep,",
+				"          Createddate,",
+				"          Modifieddate",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"select2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          EmpID as integer,",
+				"          EmpName as string,",
+				"          EmpGender as string,",
+				"          EmpSalary as decimal(19,4),",
+				"          EmpDep as string,",
+				"          Createddate as date,",
+				"          modifieddate as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 2,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          EmpID = EmpId,",
+				"          EmpName,",
+				"          EmpGender,",
+				"          EmpSalary,",
+				"          EmpDep,",
+				"          Createddate,",
+				"          modifieddate = Modifieddate",
+				"     )) ~> insert",
+				"select3 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          EmpID as integer,",
+				"          EmpName as string,",
+				"          EmpGender as string,",
+				"          EmpSalary as decimal(19,4),",
+				"          EmpDep as string,",
+				"          Createddate as date,",
+				"          modifieddate as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     keys:['EmpId'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 1,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> update",
+				"split1@DONOTHING sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          EmpID as integer,",
+				"          EmpName as string,",
+				"          EmpGender as string,",
+				"          EmpSalary as decimal(19,4),",
+				"          EmpDep as string,",
+				"          Createddate as date,",
+				"          modifieddate as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     keys:['EmpId'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 3,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> donothing"
+			]
+		}
+	}
+}

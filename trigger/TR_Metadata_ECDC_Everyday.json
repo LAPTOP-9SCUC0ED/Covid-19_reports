@@ -1,0 +1,24 @@
+{
+	"name": "TR_Metadata_ECDC_Everyday",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "PL_Metadata_edcd",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2022-12-31T13:05:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

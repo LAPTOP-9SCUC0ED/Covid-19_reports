@@ -1,0 +1,25 @@
+{
+	"name": "DS_targetADLSCovid19",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_COVID19GEN2DL",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "population_age.tsv",
+				"folderPath": "population",
+				"fileSystem": "covid19"
+			},
+			"columnDelimiter": "\t",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

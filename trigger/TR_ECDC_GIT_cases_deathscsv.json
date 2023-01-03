@@ -1,0 +1,28 @@
+{
+	"name": "TR_ECDC_GIT_cases_deathscsv",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "PL_ingerstion_ECDC_git_dataloader",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"sourceurl": "cloudboxacademy/covid19/raw/main/ecdc_data/cases_deaths.csv",
+					"targetfilename": "cases_deaths.csv"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2022-12-31T00:11:19Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

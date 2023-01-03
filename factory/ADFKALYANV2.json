@@ -1,0 +1,9 @@
+{
+	"name": "ADFKALYANV2",
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "0f0d4797-4f18-4bb1-a63d-aad1fc1eb3df",
+		"tenantId": "11b9807d-504c-452e-a842-82d4bf40df26"
+	}
+}
