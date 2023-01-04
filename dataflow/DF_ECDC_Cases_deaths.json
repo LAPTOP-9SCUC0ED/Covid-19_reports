@@ -10,6 +10,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "source"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_Lookup_country_ADLS",
+						"type": "DatasetReference"
+					},
+					"name": "Sourcelookuocountrcode"
 				}
 			],
 			"sinks": [],
@@ -24,7 +31,10 @@
 					"name": "pivot1"
 				},
 				{
-					"name": "derivedColumn1"
+					"name": "lookupcountrycode"
+				},
+				{
+					"name": "selectforsink"
 				}
 			],
 			"scriptLines": [
@@ -34,14 +44,24 @@
 				"          continent as string,",
 				"          population as string,",
 				"          indicator as string,",
-				"          daily_count as string,",
-				"          date as string,",
+				"          daily_count as integer,",
+				"          date as date,",
 				"          rate_14_day as string,",
 				"          source as string",
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> source",
+				"source(output(",
+				"          country as string,",
+				"          country_code_2_digit as string,",
+				"          country_code_3_digit as string,",
+				"          continent as string,",
+				"          population as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Sourcelookuocountrcode",
 				"source filter(continent == 'Europe' && not(isNull(country_code))) ~> filter",
 				"filter select(mapColumn(",
 				"          country,",
@@ -55,7 +75,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
-				"derivedColumn1 pivot(groupBy(country,",
+				"select1 pivot(groupBy(country,",
 				"          country_code,",
 				"          population,",
 				"          source,",
@@ -64,8 +84,22 @@
 				"     count = sum(daily_count),",
 				"     columnNaming: '$V$N',",
 				"     lateral: true) ~> pivot1",
-				"select1 derive(daily_count = toInteger(daily_count),",
-				"          splcountrycode = concat(country, country_code)) ~> derivedColumn1"
+				"pivot1, Sourcelookuocountrcode lookup(pivot1@country == Sourcelookuocountrcode@country,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupcountrycode",
+				"lookupcountrycode select(mapColumn(",
+				"          country = pivot1@country,",
+				"          country_code_2_digit,",
+				"          country_code_3_digit,",
+				"          population = pivot1@population,",
+				"          {confirmed casescount},",
+				"          deathscount,",
+				"          reporteddate,",
+				"          source",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectforsink"
 			]
 		}
 	}
